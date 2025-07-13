@@ -1,0 +1,29 @@
+@import '../../styles/variables';
+
+.todo-item {
+	display: flex;
+	align-items: center;
+	padding: $spacing-3;
+	border-radius: $border-radius-md;
+	border: 1px solid $light-gray-border;
+	background-color: $white-bg; /* Alapértelmezett háttér */
+	margin-bottom: $spacing-2; // Tailwind mb-2
+
+	span {
+		flex: 1;
+		font-size: $font-size-base;
+		color: $primary-text-color;
+		margin-left: $spacing-3;
+	}
+
+	&:hover {
+		background-color: $light-gray; /* Hover állapot */
+	}
+}
+
+.completed {
+	color: $completed-text-color;
+	text-decoration: line-through;
+	background-color: $light-green-bg; /* Kész teendő háttér */
+}
+

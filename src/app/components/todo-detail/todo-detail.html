@@ -1,0 +1,10 @@
+<div class="todo-detail">
+	<h2>Teendó részletei</h2>
+	<p *ngIf="todoId !== null">
+		Teendó ID: <strong>{{ todoId }}</strong>
+	</p>
+	<p *ngIf="todoId === null">
+		Nincs kiválasztott teendó.
+	</p>
+	<!-- Add more details about the todo item here -->
+</div>

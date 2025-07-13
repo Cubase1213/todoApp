@@ -1,0 +1,11 @@
+<!-- src/app/todo-item/todo-item-html -->
+<li class="todo-item" [ngClass]="{ 'completed': todo.completed }">
+	<input
+		type="checkbox"
+		[checked]="todo.completed"
+		(change)="onToggleCompleted()"
+	>
+	<span [class.completed]="todo.completed">
+		{{ todo.title }}
+	</span>
+</li>

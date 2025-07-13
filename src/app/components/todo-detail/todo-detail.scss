@@ -1,0 +1,25 @@
+@import '../../styles/variables.scss';
+
+.todo-detail {
+    width: 100%;
+    max-width: 28rem; // Ugyanaz, mint a todo-list
+    background-color: $white-bg;
+    border-radius: $border-radius-lg;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    padding: $spacing-6;
+    text-align: center; // Középre igazítás
+    margin: 0 auto; // Középre igazítás
+    h2 {
+        font-size: 1.5rem;
+        line-height: 2rem;
+        font-weight: 600;
+        color: $primary-text-color;
+        margin-bottom: $spacing-4;
+    }
+    p {
+        font-size: 1rem;
+        line-height: 1.5rem;
+        color: $secondary-text-color;
+        margin-bottom: $spacing-4;
+    }
+}

@@ -1,0 +1,23 @@
+<div class="todo-list">
+    <h2>Teendőim</h2>
+
+    <!-- Új teendő hozzáadása űrlap -->
+    <form (ngSubmit)="addTodo()">
+        <input
+            type="text"
+            [(ngModel)]="newTodoTitle"
+            name="newTodoTitle"
+            placeholder="Új teendő hozzáadása..."
+        >
+        <button type="submit">Hozzáadás</button>
+    </form>
+
+    <!-- A teendőlista megjelenítése -->
+    <ul>
+        @for (todo of todos(); track todo.id) {
+            <app-todo-item [todo]="todo" (completedChange)="handleCompletedChange($event)"></app-todo-item>
+        } @empty {
+            <li class="empty">Nincsenek teendők.</li>
+        }
+    </ul>
+</div>
