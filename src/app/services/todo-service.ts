@@ -30,6 +30,7 @@ export class TodoService {
 	}
 
 	toggleCompletted(id: number): void {
+		console.log('Toggling completion for Todo ID:', id);
 		this._todos.update(currentTodos => 
 			currentTodos.map(todo => 
 				todo.id === id ? { ...todo, completed: !todo.completed } : todo

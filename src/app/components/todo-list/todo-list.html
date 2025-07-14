@@ -15,9 +15,15 @@
     <!-- A teendőlista megjelenítése -->
     <ul>
         @for (todo of todos(); track todo.id) {
-            <app-todo-item [todo]="todo" (completedChange)="handleCompletedChange($event)"></app-todo-item>
+            <app-todo-item
+                [todo]="todo"
+                (completedChange)="toggleCompletted($event)"
+                [routerLink]="['/todo', todo.id]"
+                routerLinkActive="active"
+            ></app-todo-item>
         } @empty {
             <li class="empty">Nincsenek teendők.</li>
         }
     </ul>
 </div>
+<!-- [routerLink]="['/todo', todo.id]" -->

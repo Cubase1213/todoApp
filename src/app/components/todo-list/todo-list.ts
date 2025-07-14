@@ -1,20 +1,21 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TodoItem } from '../todo-item/todo-item';
 import { FormsModule } from '@angular/forms';
+import { TodoItem } from '../todo-item/todo-item';
 import { TodoService } from '../../services/todo-service';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
 	selector: 'app-todo-list',
 	standalone: true,
-	imports: [CommonModule, TodoItem, FormsModule],
+	imports: [CommonModule, TodoItem, FormsModule, RouterLink, RouterLinkActive],
 	templateUrl: './todo-list.html',
 	styleUrl: './todo-list.scss'
 })
 
 export class TodoList {
 
-	private todoService = inject(TodoService);
+	todoService = inject(TodoService);
 
 	todos = this.todoService.todos;
 	newTodoTitle: string = '';
@@ -23,7 +24,8 @@ export class TodoList {
 		console.log('TodoList component initialized');
 	}
 
-	handleCompletedChange(id: number): void {
+	toggleCompletted(id: number): void {
+		console.log('Toggling completion for Todo ID (list):', id);
 		this.todoService.toggleCompletted(id);
 	}
 

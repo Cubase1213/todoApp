@@ -18,7 +18,9 @@ export class TodoItem {
 		// A konstruktorban nem biztos, hogy az input már elérhető,
 	}
 
-	onToggleCompleted(): void {
+	onToggleCompleted(event: Event): void {
+		console.log('Toggling (item)', this.todo.id);
+		event.stopPropagation(); // Megakadályozza az esemény buborékolását
 		this.completedChange.emit(this.todo.id);
 	}
 }

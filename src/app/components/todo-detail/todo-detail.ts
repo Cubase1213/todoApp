@@ -1,7 +1,10 @@
+import { Component, OnInit, OnDestroy, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { switchMap } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { TodoService } from '../../services/todo-service';
 
 @Component({
 	selector: 'app-todo-detail',
@@ -11,22 +14,36 @@ import { ActivatedRoute } from '@angular/router';
 	styleUrl: './todo-detail.scss'
 })
 
-export class TodoDetail implements OnInit {
-	todoId: number | null = null;
-	private routeSubscription: Subscription | undefined;
+export class TodoDetail implements OnInit, OnDestroy {
 
-	constructor(private route: ActivatedRoute) {}
+	private route = inject(ActivatedRoute);
+	private router = inject(Router);
+	private todoService = inject(TodoService);
 
-	ngOnInit(): void {
-		this.routeSubscription = this.route.paramMap.subscribe(params => {
+	todoId = toSignal(this.route.paramMap.pipe(
+		switchMap(params => {
 			const idParam = params.get('id');
-			if (idParam) {
-				this.todoId = +idParam; // Convert string to number
-				console.log(`Todo ID: ${this.todoId}`);
-			} else {
-				this.todoId = null;
-				console.warn('No ID provided in route parameters.');
-			}
-		});
+			return of(idParam ? +idParam : null); // Convert string to number or null
+		})
+	));
+
+	selectedTodo = computed(() => {
+		const currentId = this.todoId();
+		if (typeof currentId === 'number') {
+			const currentTodo= this.todoService.getTodoById(currentId)();
+			console.log('Selected Todo in detail:', currentTodo);
+			return this.todoService.getTodoById(currentId)();
+		}
+		return undefined;
+	});
+
+	constructor() {}
+
+	ngOnInit(): void {}
+
+	ngOnDestroy(): void {}
+
+	goBack(): void {
+		this.router.navigate(['/todos']);
 	}
 }
