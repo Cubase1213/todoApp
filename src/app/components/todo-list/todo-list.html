@@ -1,23 +1,28 @@
 <div class="todo-list">
     <h2>Teendőim</h2>
 
-    <!-- Új teendő hozzáadása űrlap -->
-    <form (ngSubmit)="addTodo()">
-        <input
-            type="text"
-            [(ngModel)]="newTodoTitle"
-            name="newTodoTitle"
-            placeholder="Új teendő hozzáadása..."
-        >
-        <button type="submit">Hozzáadás</button>
-    </form>
+    <div class="new-todo-form">
+        <!-- Új teendő hozzáadása űrlap -->
+        <form [formGroup]="newTodoForm" (ngSubmit)="addTodo()">
+            <input
+                type="text"
+                formControlName="title"
+                placeholder="Új teendő hozzáadása..."
+            >
+            <button type="submit" [disabled]="newTodoForm.invalid">Hozzáadás</button>
+        </form>
+        @if (newTodoForm.get('title')?.invalid && newTodoForm.get('title')?.touched) {
+            <p class="validation-error">A teendő címe kötelező.</p>
+        }
+    </div>
 
     <!-- A teendőlista megjelenítése -->
     <ul>
         @for (todo of todos(); track todo.id) {
             <app-todo-item
                 [todo]="todo"
-                (completedChange)="toggleCompletted($event)"
+                (completedChange)="todoService.toggleCompletted($event)"
+                (deleteTodo)="todoService.deleteTodo($event)"
                 [routerLink]="['/todo', todo.id]"
                 routerLinkActive="active"
             ></app-todo-item>

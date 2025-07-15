@@ -1,11 +1,27 @@
 <div class="todo-detail">
 	<h2>Teendó részletei</h2>
 	@if (selectedTodo()) {
-		<p><strong>ID:</strong> {{ selectedTodo()!.id }}</p>
-		<p><strong>Feladat:</strong> {{ selectedTodo()!.title }}</p>
-		<p><strong>Befejezett:</strong>
-			<span> {{ selectedTodo()!.completed ? 'Igen' : 'Nem' }} </span>
-		</p>
+		<div class="todo-detail-card">
+			<!-- Megjelenítés mód -->
+			@if (!isEditMode()) {
+				<h3>{{ selectedTodo()?.title }}</h3>
+				<p>Státusz: {{ selectedTodo()?.completed ? 'Befejezve' : 'Függőben' }}</p>
+				<p>Létrehozva: {{ selectedTodo()?.createdAt | date:'short' }}</p>
+				<button (click)="startEdit()">Szerkesztés</button>
+			}
+			<!-- Szerkesztési mód -->
+			@else {
+				<form (ngSubmit)="saveEdit()">
+					<input
+						[(ngModel)]="editedTodo"
+						placeholder="Teendó címe"
+						name="todoTitle"
+					/>
+					<button type="submit">Mentés</button>
+					<button type="button" (click)="cancelEdit()">Mégse</button>
+				</form>
+			}
+		</div>
 	} @else {
 		<p>Nincs kiválasztott teendő.</p>
 	}

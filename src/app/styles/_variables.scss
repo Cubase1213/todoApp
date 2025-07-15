@@ -2,6 +2,7 @@
 $primary-text-color: #1f2937;
 $secondary-text-color: #374151;
 $completed-text-color: #6b7280;
+$red-error-color: #ef4444; // Tailwind red-500
 
 $light-gray-border: #e5e7eb;
 
@@ -11,18 +12,21 @@ $dark-gray: #111827;
 // background color variables
 $light-green-bg: #f0fdf4;
 $white-bg: #ffffff;
+$danger-bg: #ef4444; // Red for delete button
 
 // accent color variables
 $blue-accent-color: #2563eb;
 $green-accent-color: #10b981;
 
 // spacing variables
+$spacing-1: 0.25rem; // 4px
 $spacing-2: 0.5rem; // 8px
 $spacing-3: 0.75rem; // 12px
 $spacing-4: 1rem;    // 16px
 $spacing-6: 1.5rem;  // 24px
 $spacing-8: 2rem;    // 32px
 
+$border-radius-sm: 0.25rem; // 4px
 $border-radius-md: 0.375rem; // 6px
 $border-radius-lg: 0.5rem;  // 8px
 

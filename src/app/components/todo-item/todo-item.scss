@@ -5,7 +5,8 @@
 	align-items: center;
 	padding: $spacing-3;
 	border-radius: $border-radius-md;
-	border: 1px solid $light-gray-border;
+	border: 1px solid $white-bg;
+	// border: 1px solid $light-gray-border;
 	background-color: $white-bg; /* Alapértelmezett háttér */
 	margin-bottom: $spacing-2; // Tailwind mb-2
 
@@ -17,13 +18,40 @@
 	}
 
 	&:hover {
-		background-color: $light-gray; /* Hover állapot */
+		border: 1px solid $light-gray-border; /* Hover border szín */
+		box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); /* Hover árnyék */
+		transition: box-shadow 0.2s ease; /* Áttűnés */
 	}
-}
+
+	.todo-title {
+		cursor: pointer;
+		text-decoration: none;
+
+		&:hover {
+			color: $primary-text-color;
+		}
+	}
+
+	.item-delete-btn {
+		background-color: $danger-bg;
+		color: $white-bg;
+		border: none;
+		border-radius: $border-radius-sm;
+		padding: $spacing-1 $spacing-2;
+		cursor: pointer;
+		font-size: $font-size-sm;
+		margin-left: auto; /* Jobbra igazítás */
+	
+		&:hover {
+			background-color: darken($danger-bg, 10%);
+		}
+	}
+
+}	
 
 .completed {
 	color: $completed-text-color;
 	text-decoration: line-through;
 	background-color: $light-green-bg; /* Kész teendő háttér */
 }
-
+	

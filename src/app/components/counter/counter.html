@@ -1,0 +1,12 @@
+<div class="counter-container">
+    <h3 class="counter-title">Számláló Komponens</h3>
+    <p class="counter-value">Érték: {{ count() }}</p>
+    <div class="counter-buttons">
+        <button (click)="decrement()" class="counter-button decrement-button">
+            Csökkent
+        </button>
+        <button (click)="increment()" class="counter-button increment-button">
+            Növel
+        </button>
+    </div>
+</div>

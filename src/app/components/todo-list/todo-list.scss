@@ -20,3 +20,19 @@
 	text-align: center;
 	padding: $spacing-4;
 }
+
+.new-todo-form {
+	position: relative;
+}
+
+/* Validációs hibaüzenet stílusai */
+.validation-error {
+	position: absolute;
+	top: $spacing-2;
+	color: $red-error-color;
+	/* Kisebb betűméret */
+	font-size: 0.875rem;
+	text-align: left;
+	/* Kis behúzás */
+	padding-left: $spacing-2;
+}

@@ -3,9 +3,11 @@
 	<input
 		type="checkbox"
 		[checked]="todo.completed"
-		(change)="onToggleCompleted($event)"
+		(click)="onToggleCompleted($event)"
 	>
-	<span [class.completed]="todo.completed">
-		{{ todo.title }}
-	</span>
+	<div class="todo-content">
+		<span [class.completed]="todo.completed" class="todo-title">{{ todo.title }}</span>
+		<span class="todo-created-at">{{ todo.createdAt | date: 'yyyy.MM.dd' }}</span>
+	</div>
+	<button class="item-delete-btn" (click)="onDelete($event)">X</button>
 </li>

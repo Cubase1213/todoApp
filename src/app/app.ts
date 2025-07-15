@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { TodoList } from './components/todo-list/todo-list';
 import { CommonModule } from '@angular/common';
+import { CounterComponent } from './components/counter/counter';
 
 @Component({
 	selector: 'app-root',
@@ -11,10 +11,14 @@ import { CommonModule } from '@angular/common';
 		RouterOutlet,
 		RouterLink,
 		RouterLinkActive,
+		CounterComponent,
 	],
 	templateUrl: './app.html',
 	styleUrl: './app.scss'
 })
 export class App {
 	protected title = 'Teendőlista App';
+
+	// Példa a kétirányú adatkötésre
+	parentCount = signal(10);
 }
