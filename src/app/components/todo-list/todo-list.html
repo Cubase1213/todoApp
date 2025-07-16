@@ -8,11 +8,26 @@
                 type="text"
                 formControlName="title"
                 placeholder="Új teendő hozzáadása..."
+                (focus)="isFormFocused.set(true)"
+                (blur)="isFormFocused.set(false)"
             >
             <button type="submit" [disabled]="newTodoForm.invalid">Hozzáadás</button>
         </form>
-        @if (newTodoForm.get('title')?.invalid && newTodoForm.get('title')?.touched) {
-            <p class="validation-error">A teendő címe kötelező.</p>
+        @if (newTodoForm.get('title')?.touched &&
+            newTodoForm.get('title')?.invalid && 
+            !isFormFocused()) {
+            @if (newTodoForm.get('title')?.hasError('required')) {
+                <p class="validation-error">A teendő címe kötelező.</p>
+            }
+            @else if (newTodoForm.get('title')?.hasError('minlength')) {
+                <p class="validation-error">A teendő címe legalább 3 karakterből álljon.</p>
+            }
+            @else if (newTodoForm.get('title')?.hasError('maxlength')) {
+                <p class="validation-error">A teendő címe legfeljebb 50 karakterből álljon.</p>
+            }
+            @else if (newTodoForm.get('title')?.hasError('forbiddenWord')) {
+                <p class="validation-error">A teendő címe nem tartalmazhat tiltott szavakat.</p>
+            }
         }
     </div>
 
@@ -21,7 +36,7 @@
         @for (todo of todos(); track todo.id) {
             <app-todo-item
                 [todo]="todo"
-                (completedChange)="todoService.toggleCompletted($event)"
+                (completedChange)="todoService.toggleCompleted($event)"
                 (deleteTodo)="todoService.deleteTodo($event)"
                 [routerLink]="['/todo', todo.id]"
                 routerLinkActive="active"

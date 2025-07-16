@@ -1,5 +1,7 @@
-import { Injectable, signal, computed } from '@angular/core';
-import { TodoInterface } from '../interfaces/todo-interfaces';
+import { Injectable, signal, computed, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of, delay, tap, map } from 'rxjs';
+import { TodoInterface, TodoApiResponse } from '../interfaces/todo-interfaces';
 
 @Injectable({
   providedIn: 'root'
@@ -7,55 +9,154 @@ import { TodoInterface } from '../interfaces/todo-interfaces';
 
 export class TodoService {
 
-	private _todos = signal<TodoInterface[]>([
-		{ id: 1, title: 'Learn Angular', completed: false, createdAt: new Date('2025-07-13T10:30:00') },
-		{ id: 2, title: 'Build a Todo App', completed: false, createdAt: new Date('2025-07-15T07:00:00') },
-		{ id: 3, title: 'Deploy the App', completed: false, createdAt: new Date('2025-07-15T07:30:00') },
-		{ id: 4, title: 'Write Tests', completed: false, createdAt: new Date('2025-07-15T08:00:00') }
-	]);
+	private http = inject(HttpClient);
+
+	private baseUrl = 'https://dummyjson.com';
+
+	private _todos = signal<TodoInterface[]>([]);
 
 	todos = computed(() => this._todos());
 
 	constructor() {
+		this.loadTodos();
 		console.log('TodoService initialized with todos:', this.todos());
 	}
 
+	fetchTodosFromApi(): Observable<TodoInterface[]> {
+		return this.http.get<TodoApiResponse>(`${this.baseUrl}/todos`)
+			.pipe(
+				// Egy kis késleltetés, hogy jobban érzékelhető legyen a hálózati hívás
+				delay(1000),
+				tap((response) => console.log('Fetched Todos from API:', response)),
+				map(response => response.todos.map(apiTodo => ({
+					id: apiTodo.id,
+					title: apiTodo.todo,
+					completed: apiTodo.completed,
+					createdAt: new Date(),
+					userId: apiTodo.userId
+				}))),
+			);
+	}
+
+	loadTodos(): void {
+		this.fetchTodosFromApi().subscribe({
+			next: (todos) => {
+				this._todos.set(todos);
+				console.log('Teendők betöltve:', this.todos());
+			},
+			error: (error) => console.error('Hiba a teendők betöltésekor:', error)
+		});
+	}
+
 	addTodo(title: string): void {
-		const newTodo: TodoInterface = {
-			id: this._todos().length > 0 ? Math.max(...this._todos().map(t => t.id)) + 1 : 1,
-			title: title.trim(),
+		const newTodo = {
+			todo: title.trim(),
 			completed: false,
-			createdAt: new Date()
+			userId: 1
 		};
-		this._todos.update(currentTodos => [...currentTodos, newTodo]);
-		console.log('Added Todo:', newTodo);
+
+		this.http.post<any>(`${this.baseUrl}/todos/add`, newTodo)
+			.pipe(
+				delay(1000), // Késleltetés a szimulációhoz
+				tap((response) => console.log('API válasz új teendő hozzáadásakor:', response)),
+				map(apiResponse => ({
+					id: apiResponse.id,
+					title: apiResponse.todo,
+					completed: apiResponse.completed,
+					createdAt: new Date(),
+					userId: apiResponse.userId
+				}))
+			)
+			.subscribe({
+				next: (addedTodo) => {
+					this._todos.update(currentTodos => [...currentTodos, addedTodo]);
+					console.log('Új teendő hozzáadva:', addedTodo);
+				},
+				error: (error) => console.error('Hiba új teendő hozzáadásakor:', error)
+			});
 	}
 
-	toggleCompletted(id: number): void {
-		console.log('Toggling completion for Todo ID:', id);
-		this._todos.update(currentTodos => 
-			currentTodos.map(todo => 
-				todo.id === id ? { ...todo, completed: !todo.completed } : todo
+	/**
+	 * A teendő befejezettségi állapotának módosítása
+	 * Előtte elküljük az API-nak a módosítást
+	 * @param id Az azonosítója a teendőnek, amelyet módosítani szeretnénk
+	 */
+	toggleCompleted(id: number): void {
+		const todoToUpdate = this._todos().find(todo => todo.id === id);
+		if (!todoToUpdate) return;
+
+		const newCompletedStatus = !todoToUpdate.completed;
+
+		this.http.put<any>(`${this.baseUrl}/todos/${id}`, { completed: newCompletedStatus })
+			.pipe(
+				delay(1000), // Késleltetés a szimulációhoz
+				tap((response) => console.log('API válasz teendő befejezettségi állapotának módosításakor:', response)),
+				map(apiResponse => ({
+					id: apiResponse.id,
+					title: apiResponse.todo,
+					completed: apiResponse.completed,
+					createdAt: todoToUpdate.createdAt,
+					userId: apiResponse.userId
+				}))
 			)
-		);
-		console.log('Updated Todos:', this.todos());
+			.subscribe({
+				next: (receivedTodo) => {
+					this._todos.update(currentTodos => 
+						currentTodos.map(todo => 
+							todo.id === id ? { ...todo, completed: receivedTodo.completed } : todo
+						)
+					);
+					console.log('Teendő befejezettségi állapota módosítva:', receivedTodo);
+				},
+				error: (error) => console.error('Hiba a teendő befejezettségi állapotának módosításakor:', error)
+			});
 	}
 
-	updateTodo(id: number, title: string): void {
-		this._todos.update(currentTodos => 
-			currentTodos.map(todo => 
-				todo.id === id ? { ...todo, title: title.trim() } : todo
+	updateTodo(id: number, newTitle: string): void {
+		const todoToUpdate = this._todos().find(todo => todo.id === id);
+		if (!todoToUpdate) return;
+
+		this.http.put<any>(`${this.baseUrl}/todos/${id}`, { todo: newTitle.trim() })
+			.pipe(
+				delay(1000), // Késleltetés a szimulációhoz
+				tap((response) => console.log('API válasz teendő frissítésekor:', response)),
+				map(apiResponse => ({
+					id: apiResponse.id,
+					title: apiResponse.todo,
+					completed: todoToUpdate.completed,
+					createdAt: todoToUpdate.createdAt,
+					userId: apiResponse.userId
+				}))
 			)
-		);
-		console.log('Updated Todos:', this.todos());
+			.subscribe({
+				next: (receivedTodo) => {
+					this._todos.update(currentTodos => 
+						currentTodos.map(todo => 
+							todo.id === id ? { ...todo, title: receivedTodo.title } : todo
+						)
+					);
+					console.log('Teendő frissítve:', receivedTodo);
+				},
+				error: (error) => console.error('Hiba a teendő frissítésekor:', error)
+			});
 	}
 
 	deleteTodo(id: number): void {
-		this._todos.update(currentTodos => 
-			currentTodos.filter(todo => todo.id !== id)
-		);
-		console.log('Deleted Todo ID:', id);
-		console.log('All Todos after delete:', this.todos());
+		this.http.delete<any>(`${this.baseUrl}/todos/${id}`)
+			.pipe(
+				delay(1000), // Késleltetés a szimulációhoz
+				tap((response) => console.log('API válasz teendő törlésekor:', response)))
+			.subscribe({
+				next: (apiResponse) => {
+					if (apiResponse.isDeleted) {
+						this._todos.update(currentTodos => 
+							currentTodos.filter(todo => todo.id !== id)
+						);
+						console.log('Teendő törölve:', id);
+					}
+				},
+				error: (error) => console.error('Hiba a teendő törlésekor:', error)
+			});
 	}
 
 	getTodoById(id: number) {
