@@ -1,13 +1,16 @@
 <!-- src/app/todo-item/todo-item-html -->
-<li class="todo-item" [ngClass]="{ 'completed': todo.completed }">
+<li class="todo-item"
+	[ngClass]="{ 'completed': todo.completed }"
+	[@deleteAnimation]="animationState">
 	<input
 		type="checkbox"
 		[checked]="todo.completed"
 		(click)="onToggleCompleted($event)"
+		[disabled]="isDeleting"
 	>
 	<div class="todo-content">
 		<span [class.completed]="todo.completed" class="todo-title">{{ todo.title }}</span>
 		<span class="todo-created-at">{{ todo.createdAt | date: 'yyyy.MM.dd' }}</span>
 	</div>
-	<button class="item-delete-btn" (click)="onDelete($event)">X</button>
+	<button class="item-delete-btn" (click)="onDelete($event)" [disabled]="isDeleting">X</button>
 </li>

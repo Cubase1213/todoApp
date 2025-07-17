@@ -32,14 +32,16 @@
     </div>
 
     <!-- A teendőlista megjelenítése -->
-    <ul>
+    <ul class="todo-list-ul" [@listAnimation]="todos().length">
         @for (todo of todos(); track todo.id) {
             <app-todo-item
                 [todo]="todo"
                 (completedChange)="todoService.toggleCompleted($event)"
-                (deleteTodo)="todoService.deleteTodo($event)"
-                [routerLink]="['/todo', todo.id]"
+                (deleteTodo)="handleDeleteTodo($event)"
+                [routerLink]="deletingTodoIds().has(todo.id) ? null : ['/todo', todo.id]"
                 routerLinkActive="active"
+                class="todo-item-link"
+                [isDeleting]="deletingTodoIds().has(todo.id)"
             ></app-todo-item>
         } @empty {
             <li class="empty">Nincsenek teendők.</li>

@@ -26,7 +26,7 @@ export class TodoService {
 		return this.http.get<TodoApiResponse>(`${this.baseUrl}/todos`)
 			.pipe(
 				// Egy kis késleltetés, hogy jobban érzékelhető legyen a hálózati hívás
-				delay(1000),
+				// delay(1000),
 				tap((response) => console.log('Fetched Todos from API:', response)),
 				map(response => response.todos.map(apiTodo => ({
 					id: apiTodo.id,
@@ -39,6 +39,7 @@ export class TodoService {
 	}
 
 	loadTodos(): void {
+		this._todos.set([]); // Reset the todos before loading
 		this.fetchTodosFromApi().subscribe({
 			next: (todos) => {
 				this._todos.set(todos);
@@ -57,7 +58,7 @@ export class TodoService {
 
 		this.http.post<any>(`${this.baseUrl}/todos/add`, newTodo)
 			.pipe(
-				delay(1000), // Késleltetés a szimulációhoz
+				// delay(1000), // Késleltetés a szimulációhoz
 				tap((response) => console.log('API válasz új teendő hozzáadásakor:', response)),
 				map(apiResponse => ({
 					id: apiResponse.id,
@@ -89,7 +90,7 @@ export class TodoService {
 
 		this.http.put<any>(`${this.baseUrl}/todos/${id}`, { completed: newCompletedStatus })
 			.pipe(
-				delay(1000), // Késleltetés a szimulációhoz
+				// delay(1000), // Késleltetés a szimulációhoz
 				tap((response) => console.log('API válasz teendő befejezettségi állapotának módosításakor:', response)),
 				map(apiResponse => ({
 					id: apiResponse.id,
@@ -118,7 +119,7 @@ export class TodoService {
 
 		this.http.put<any>(`${this.baseUrl}/todos/${id}`, { todo: newTitle.trim() })
 			.pipe(
-				delay(1000), // Késleltetés a szimulációhoz
+				// delay(1000), // Késleltetés a szimulációhoz
 				tap((response) => console.log('API válasz teendő frissítésekor:', response)),
 				map(apiResponse => ({
 					id: apiResponse.id,
@@ -141,22 +142,22 @@ export class TodoService {
 			});
 	}
 
-	deleteTodo(id: number): void {
-		this.http.delete<any>(`${this.baseUrl}/todos/${id}`)
+	deleteTodo(id: number): Observable<void> {
+		return this.http.delete<any>(`${this.baseUrl}/todos/${id}`)
 			.pipe(
 				delay(1000), // Késleltetés a szimulációhoz
-				tap((response) => console.log('API válasz teendő törlésekor:', response)))
-			.subscribe({
-				next: (apiResponse) => {
+				tap((response) => console.log('API válasz teendő törlésekor:', response)),
+				map(apiResponse => {
 					if (apiResponse.isDeleted) {
 						this._todos.update(currentTodos => 
 							currentTodos.filter(todo => todo.id !== id)
 						);
-						console.log('Teendő törölve:', id);
+						return;
+					} else {
+						throw new Error('Teendő törlése sikertelen');
 					}
-				},
-				error: (error) => console.error('Hiba a teendő törlésekor:', error)
-			});
+				})
+			)
 	}
 
 	getTodoById(id: number) {
